@@ -1,0 +1,15 @@
+{
+  "name": "capture-crew",
+  "version": "1.0.0",
+  "description": "Photography and videography booking website",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

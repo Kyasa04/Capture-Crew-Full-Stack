@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crew Services | Capture Crew</title>
+  <link rel="stylesheet" href="crew.css" />
+</head>
+<body>
+  <div class="bg-overlay"></div>
+
+  <header>
+    <h2>📋 Crew Services</h2>
+    <div class="profile-menu">
+      <a href="crew.html">Dashboard</a>
+      <a href="crewprofile.html">Profile</a>
+    </div>
+  </header>
+
+  <section class="content-box">
+    <h3>Available Service Requests</h3>
+    <p>Browse and accept new photo/video service opportunities from clients.</p>
+
+    <div id="servicesList" class="service-list">
+      <!-- Service cards will be injected here -->
+    </div>
+
+    <div id="statusMsg" style="margin-top:12px;color:green;"></div>
+    <div style="margin-top:18px;">
+      <button class="btn" onclick="window.location.href='crew.html'">Back to Dashboard</button>
+    </div>
+  </section>
+
+<script>
+/*
+ Data:
+ - serviceRequests: array of {id,title,location,date,details}
+ - crewProjects: array of projects saved by crew
+ - crewMessages: array of messages
+*/
+
+const SERVICE_KEY = 'serviceRequests';
+const PROJECTS_KEY = 'crewProjects';
+const MESSAGES_KEY = 'crewMessages';
+
+function ensureInitialData() {
+  // if there are no serviceRequests in storage, seed a few
+  if (!localStorage.getItem(SERVICE_KEY)) {
+    const sample = [
+      { id: genId(), title: 'Wedding Shoot', location: 'Mumbai', date: '2025-11-12', details: 'Full-day wedding coverage' },
+      { id: genId(), title: 'Fashion Portfolio', location: 'Delhi', date: '2025-11-18', details: 'Studio fashion shoot, 4 hours' },
+      { id: genId(), title: 'Birthday Reels', location: 'Bengaluru', date: '2025-11-22', details: 'Short reels and candid photos' }
+    ];
+    localStorage.setItem(SERVICE_KEY, JSON.stringify(sample));
+  }
+  if (!localStorage.getItem(PROJECTS_KEY)) localStorage.setItem(PROJECTS_KEY, JSON.stringify([]));
+  if (!localStorage.getItem(MESSAGES_KEY)) localStorage.setItem(MESSAGES_KEY, JSON.stringify([]));
+}
+
+function genId(){ return 'id' + Date.now() + Math.floor(Math.random()*1000); }
+
+function renderServices(){
+  const container = document.getElementById('servicesList');
+  container.innerHTML = '';
+  const services = JSON.parse(localStorage.getItem(SERVICE_KEY) || '[]');
+  if(services.length === 0){
+    container.innerHTML = '<p>No service requests right now.</p>';
+    return;
+  }
+  services.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <h4>${escapeHtml(s.title)}</h4>
+      <p><strong>Location:</strong> ${escapeHtml(s.location)}</p>
+      <p><strong>Date:</strong> ${escapeHtml(s.date)}</p>
+      <p>${escapeHtml(s.details)}</p>
+      <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn" data-id="${s.id}">Accept</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // attach listeners to Accept buttons
+  container.querySelectorAll('button[data-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      acceptService(id);
+    });
+  });
+}
+
+function acceptService(serviceId){
+  const services = JSON.parse(localStorage.getItem(SERVICE_KEY) || '[]');
+  const service = services.find(s => s.id === serviceId);
+  if(!service) return showStatus('Service not found', true);
+
+  // add to projects
+  const projects = JSON.parse(localStorage.getItem(PROJECTS_KEY) || '[]');
+  const proj = {
+    id: genId(),
+    title: service.title,
+    location: service.location,
+    date: service.date,
+    details: service.details,
+    status: 'Accepted',
+    createdAt: new Date().toISOString()
+  };
+  projects.unshift(proj);
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+
+  // add a message to crewMessages
+  const messages = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+  messages.unshift({
+    id: genId(),
+    from: 'System',
+    text: `You accepted the job: ${service.title} (${service.date}) at ${service.location}.`,
+    createdAt: new Date().toISOString(),
+    read: false
+  });
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+
+  // optionally remove the service request so others cannot accept
+  const remaining = services.filter(s => s.id !== serviceId);
+  localStorage.setItem(SERVICE_KEY, JSON.stringify(remaining));
+
+  renderServices();
+  showStatus('Service accepted and added to your projects.');
+}
+
+function showStatus(msg, isError){
+  const el = document.getElementById('statusMsg');
+  el.style.color = isError ? '#c62828' : 'green';
+  el.textContent = msg;
+  setTimeout(()=> el.textContent = '', 3500);
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+}
+
+ensureInitialData();
+renderServices();
+</script>
+</body>
+</html>

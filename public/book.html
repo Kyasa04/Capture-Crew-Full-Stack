@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Service | Capture Crew</title>
+  <link rel="stylesheet" href="book.css">
+</head>
+<body>
+  <div class="bg-overlay"></div>
+
+  <header>
+    <h2>📸 Book Your Service</h2>
+  </header>
+
+  <section class="booking-section">
+    <div class="booking-box">
+      <h3 id="serviceTitle">Book Your Service</h3>
+      <p id="servicePrice"></p>
+
+      <form id="bookingForm">
+        <input type="text" id="fullname" placeholder="Full Name" required>
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+        <input type="email" id="email" placeholder="Email Address" required>
+        <input type="date" id="date" required>
+        <input type="time" id="time" required>
+        <input type="text" id="location" placeholder="Event Location" required>
+        <textarea id="additional" placeholder="Additional Info (optional)"></textarea>
+        <button type="submit">Confirm Booking</button>
+      </form>
+
+      <div id="confirmationMsg" class="hidden">
+        <h3>✅ Booking Confirmed!</h3>
+        <p>Your booking has been successfully created.</p>
+        <p> We will contact you shortly with further details.</p>
+        <button onclick="trackCrew()">Track Your Crew</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const service = params.get("service");
+    const price = params.get("price");
+
+    if (service) {
+      document.getElementById("serviceTitle").textContent = `Book: ${service}`;
+    }
+    if (price) {
+      document.getElementById("servicePrice").textContent = `Price: ₹${price}`;
+    }
+
+    const form = document.getElementById("bookingForm");
+    const confirmation = document.getElementById("confirmationMsg");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      form.classList.add("hidden");
+      confirmation.classList.remove("hidden");
+    });
+
+    function trackCrew() {
+      window.location.href = "trackcrew.html";
+    }
+  </script>
+</body>
+</html>

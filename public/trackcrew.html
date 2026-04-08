@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Crew | Capture Crew</title>
+  <link rel="stylesheet" href="trackcrew.css">
+</head>
+<body>
+  <header>
+    <h2>📍 Track Your Crew</h2>
+  </header>
+
+  <section class="track-section">
+    <div class="track-box">
+      <h3>Live Crew Location</h3>
+      <p>Click the button below to view your crew’s location.</p>
+
+      <button onclick="getLocation()">View Live Location</button>
+
+      <div id="map"></div>
+      <p id="locationInfo"></p>
+    </div>
+  </section>
+
+  <script>
+    let map, marker;
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function showPosition(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      document.getElementById("locationInfo").innerHTML =
+        `Your current location: <br> Latitude: ${lat} <br> Longitude: ${lon}`;
+
+      // Create map
+      const mapDiv = document.getElementById("map");
+      mapDiv.innerHTML = `<iframe width="100%" height="300" style="border:0"
+        loading="lazy" allowfullscreen
+        src="https://www.google.com/maps?q=${lat},${lon}&z=15&output=embed"></iframe>`;
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied location access.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        default:
+          alert("An unknown error occurred.");
+      }
+    }
+  </script>
+</body>
+</html>

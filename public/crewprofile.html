@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crew Profile | Capture Crew</title>
+  <link rel="stylesheet" href="crewprofile.css">
+</head>
+<body>
+  <div class="profile-container">
+    <h2>Crew Profile</h2>
+
+    <div class="profile-box">
+      <p><strong>Name:</strong> <span id="crewName">-</span></p>
+      <p><strong>Email:</strong> <span id="crewEmail">-</span></p>
+      <p><strong>Field:</strong> <span id="crewField">-</span></p>
+      <p><strong>Experience:</strong> <span id="crewExp">-</span></p>
+      <p><strong>Bio:</strong> <span id="crewBio">-</span></p>
+
+      <div class="buttons">
+        <button id="editProfileBtn">Edit Profile</button>
+        <button id="changePassBtn">Change Password</button>
+        <button id="backBtn">Back to Dashboard</button>
+      </div>
+    </div>
+
+    <div id="editSection" class="hidden">
+      <h3>Edit Profile</h3>
+      <input type="text" id="editName" placeholder="Enter new name">
+      <select id="editField">
+        <option>Photographer</option>
+        <option>Videographer</option>
+        <option>Editor</option>
+        <option>Other</option>
+      </select>
+      <input type="text" id="editExp" placeholder="Enter experience (e.g. 2 years)">
+      <textarea id="editBio" placeholder="Enter new bio"></textarea>
+      <button id="saveProfileBtn">Save</button>
+    </div>
+
+    <div id="passSection" class="hidden">
+      <h3>Change Password</h3>
+      <input type="password" id="newPass" placeholder="Enter new password">
+      <input type="password" id="confirmPass" placeholder="Confirm new password">
+      <button id="savePassBtn">Save Password</button>
+    </div>
+  </div>
+
+<script>
+  // Load stored details
+  document.getElementById("crewName").textContent = localStorage.getItem("crewName") || "Not Available";
+  document.getElementById("crewEmail").textContent = localStorage.getItem("crewEmail") || "Not Available";
+  document.getElementById("crewField").textContent = localStorage.getItem("crewField") || "Not Available";
+  document.getElementById("crewExp").textContent = localStorage.getItem("crewExp") || "Not Available";
+  document.getElementById("crewBio").textContent = localStorage.getItem("crewBio") || "Not Available";
+
+  document.getElementById("backBtn").onclick = () => window.location.href = "crew.html";
+
+  document.getElementById("editProfileBtn").onclick = () => {
+    document.getElementById("editSection").classList.toggle("hidden");
+    document.getElementById("passSection").classList.add("hidden");
+  };
+
+  document.getElementById("changePassBtn").onclick = () => {
+    document.getElementById("passSection").classList.toggle("hidden");
+    document.getElementById("editSection").classList.add("hidden");
+  };
+
+  document.getElementById("saveProfileBtn").onclick = () => {
+    const newName = document.getElementById("editName").value || localStorage.getItem("crewName");
+    const newField = document.getElementById("editField").value || localStorage.getItem("crewField");
+    const newExp = document.getElementById("editExp").value || localStorage.getItem("crewExp");
+    const newBio = document.getElementById("editBio").value || localStorage.getItem("crewBio");
+
+    localStorage.setItem("crewName", newName);
+    localStorage.setItem("crewField", newField);
+    localStorage.setItem("crewExp", newExp);
+    localStorage.setItem("crewBio", newBio);
+
+    // ✅ ADD THIS: also update the main crewUser object used by dashboard
+    const user = JSON.parse(localStorage.getItem("crewUser") || "{}");
+    user.name = newName;
+    user.field = newField;
+    user.exp = newExp;
+    user.bio = newBio;
+    localStorage.setItem("crewUser", JSON.stringify(user));
+    // ✅ END ADDITION
+
+    alert("Profile updated successfully!");
+    location.reload();
+  };
+
+  document.getElementById("savePassBtn").onclick = () => {
+    const newPass = document.getElementById("newPass").value;
+    const confirmPass = document.getElementById("confirmPass").value;
+    if (newPass && newPass === confirmPass) {
+      alert("Password changed successfully!");
+      document.getElementById("passSection").classList.add("hidden");
+    } else {
+      alert("Passwords do not match!");
+    }
+  };
+</script>
+</body>
+</html>

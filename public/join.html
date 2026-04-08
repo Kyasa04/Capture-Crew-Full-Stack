@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join as Crew | Capture Crew</title>
+  <link rel="stylesheet" href="join.css">
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="form-container">
+    <h1 id="formTitle">Join as Crew Member</h1>
+    <p id="error" class="error" style="display:none;"></p>
+
+    <!-- SIGNUP FORM -->
+    <form id="signupForm">
+      <input type="text" id="signup-name" placeholder="Full Name" required>
+      <input type="email" id="signup-email" placeholder="Email (must be @gmail.com)" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <input type="password" id="signup-confirm" placeholder="Confirm Password" required>
+
+      <select id="signup-field" required>
+        <option value="">Select Field</option>
+        <option>Photographer</option>
+        <option>Videographer</option>
+        <option>Editor</option>
+        <option>Lighting Expert</option>
+        <option>Other</option>
+      </select>
+
+      <select id="signup-exp" required>
+        <option value="">Experience Level</option>
+        <option>Beginner (0–1 years)</option>
+        <option>Intermediate (2–4 years)</option>
+        <option>Professional (5+ years)</option>
+      </select>
+
+      <button type="submit">Sign Up</button>
+      <p>Already have an account? <a href="#" id="toLogin">Login</a></p>
+    </form>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" style="display:none;">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="#" id="toSignup">Sign Up</a></p>
+    </form>
+  </div>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const loginForm = document.getElementById('loginForm');
+    const toLogin = document.getElementById('toLogin');
+    const toSignup = document.getElementById('toSignup');
+    const errEl = document.getElementById('error');
+    const formTitle = document.getElementById('formTitle');
+
+    toLogin.addEventListener('click', e => { e.preventDefault(); signupForm.style.display='none'; loginForm.style.display='block'; formTitle.textContent='Crew Login'; });
+    toSignup.addEventListener('click', e => { e.preventDefault(); loginForm.style.display='none'; signupForm.style.display='block'; formTitle.textContent='Join as Crew Member'; });
+
+    function showError(msg){ errEl.textContent = msg; errEl.style.display = 'block'; }
+
+    signupForm.addEventListener('submit', e => {
+      e.preventDefault(); errEl.style.display='none';
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const pass = document.getElementById('signup-password').value;
+      const conf = document.getElementById('signup-confirm').value;
+      const field = document.getElementById('signup-field').value;
+      const exp = document.getElementById('signup-exp').value;
+
+      if(!email.endsWith('@gmail.com')) return showError('Email must end with @gmail.com');
+      if(pass !== conf) return showError('Passwords do not match');
+
+      const user = { name,email,password:pass,field,exp };
+      localStorage.setItem('crewUser', JSON.stringify(user));
+      localStorage.setItem('loggedIn','true');
+
+      // ✅ Added lines for crew profile connection
+      localStorage.setItem('crewName', name);
+      localStorage.setItem('crewEmail', email);
+      localStorage.setItem('crewField', field);
+      localStorage.setItem('crewExp', exp);
+      localStorage.setItem('crewBio', "New crew member at Capture Crew!");
+
+      window.location.href='crew.html';
+    });
+
+    loginForm.addEventListener('submit', e => {
+      e.preventDefault(); errEl.style.display='none';
+      const email=document.getElementById('login-email').value.trim();
+      const pass=document.getElementById('login-password').value;
+      const user=JSON.parse(localStorage.getItem('crewUser')||'{}');
+      if(user.email===email && user.password===pass){
+        localStorage.setItem('loggedIn','true');
+
+        // ✅ Added lines to make sure profile data loads on login too
+        localStorage.setItem('crewName', user.name);
+        localStorage.setItem('crewEmail', user.email);
+        localStorage.setItem('crewField', user.field);
+        localStorage.setItem('crewExp', user.exp);
+        localStorage.setItem('crewBio', "Welcome back to Capture Crew!");
+
+        window.location.href='crew.html';
+      } else showError('Invalid email or password');
+    });
+  </script>
+  
+</body>
+</html>

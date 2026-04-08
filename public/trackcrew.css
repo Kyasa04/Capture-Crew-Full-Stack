@@ -1,0 +1,64 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background: url('https://images.unsplash.com/photo-1519681393784-d120267933ba') no-repeat center center/cover;
+  margin: 0;
+  color: #333;
+  min-height: 100vh;
+  position: relative;
+}
+
+header {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  text-align: center;
+  padding: 16px 0;
+  z-index: 1;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.track-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 100px);
+  position: relative;
+  z-index: 1;
+}
+
+.track-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  width: 380px;
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  background: #ffcc00;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #e6b800;
+}
+
+#map {
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#locationInfo {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #555;
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Client Messages | Capture Crew</title>
+  <link rel="stylesheet" href="crew.css" />
+</head>
+<body>
+  <div class="bg-overlay"></div>
+
+  <header>
+    <h2>💬 Client Messages</h2>
+    <div class="profile-menu">
+      <a href="crew.html">Dashboard</a>
+      <a href="crewprofile.html">Profile</a>
+    </div>
+  </header>
+
+  <section class="content-box">
+    <h3>Client Feedback & Communication</h3>
+
+    <div id="messagesList" class="message-box"></div>
+
+    <div style="margin-top:12px; max-width:700px; margin-left:auto; margin-right:auto;">
+      <h4>Send quick reply (records in messages)</h4>
+      <input id="replyName" placeholder="To (client name)" style="width:100%; padding:8px; margin-bottom:8px;">
+      <textarea id="replyText" rows="3" placeholder="Write reply..." style="width:100%; padding:8px;"></textarea>
+      <div style="margin-top:8px; display:flex; gap:10px;">
+        <button class="btn" id="sendReply">Send Reply</button>
+        <button class="btn" onclick="window.location.href='crew.html'">Back to Dashboard</button>
+      </div>
+      <div id="msgStatus" style="margin-top:10px;color:green"></div>
+    </div>
+  </section>
+
+<script>
+const MESSAGES_KEY = 'crewMessages';
+
+function ensureMessages(){
+  if(!localStorage.getItem(MESSAGES_KEY)){
+    const seed = [
+      { id:'m1', from:'Rohit', text:'Loved the event photos!', createdAt: new Date().toISOString(), read:false },
+      { id:'m2', from:'Priya', text:'Can we reschedule our portfolio shoot?', createdAt: new Date().toISOString(), read:false }
+    ];
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(seed));
+  }
+}
+
+function renderMessages(){
+  const list = document.getElementById('messagesList');
+  list.innerHTML = '';
+  const msgs = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+  if(msgs.length === 0){ list.innerHTML = '<p>No messages yet.</p>'; return; }
+  msgs.forEach(m=>{
+    const el = document.createElement('div');
+    el.className = 'message';
+    el.innerHTML = `
+      <strong>${escapeHtml(m.from)}</strong>
+      <p style="margin:8px 0;">${escapeHtml(m.text)}</p>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button class="btn mark-read" data-id="${m.id}">${m.read ? 'Mark Unread' : 'Mark Read'}</button>
+        <button class="btn del-msg" data-id="${m.id}">Delete</button>
+      </div>
+    `;
+    if(m.read) el.style.opacity = '0.6';
+    list.appendChild(el);
+  });
+
+  list.querySelectorAll('.mark-read').forEach(b=>{
+    b.addEventListener('click', ()=> toggleRead(b.getAttribute('data-id')));
+  });
+  list.querySelectorAll('.del-msg').forEach(b=>{
+    b.addEventListener('click', ()=> deleteMsg(b.getAttribute('data-id')));
+  });
+}
+
+function toggleRead(id){
+  const msgs = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+  const idx = msgs.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  msgs[idx].read = !msgs[idx].read;
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(msgs));
+  renderMessages();
+}
+
+function deleteMsg(id){
+  let msgs = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+  msgs = msgs.filter(m=>m.id!==id);
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(msgs));
+  renderMessages();
+}
+
+function escapeHtml(s){ if(!s) return ''; return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+ensureMessages();
+renderMessages();
+
+document.getElementById('sendReply').addEventListener('click', ()=>{
+  const to = document.getElementById('replyName').value.trim() || 'Client';
+  const text = document.getElementById('replyText').value.trim();
+  if(!text){ showStatus('Please type a reply.', true); return; }
+
+  const msgs = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+  msgs.unshift({ id: 'm' + Date.now(), from: 'You → ' + to, text, createdAt: new Date().toISOString(), read: true });
+  localStorage.setItem(MESSAGES_KEY, JSON.stringify(msgs));
+  document.getElementById('replyText').value = '';
+  document.getElementById('replyName').value = '';
+  showStatus('Reply saved.');
+  renderMessages();
+});
+
+function showStatus(t, isErr){
+  const el = document.getElementById('msgStatus');
+  el.style.color = isErr ? '#c62828' : 'green';
+  el.textContent = t;
+  setTimeout(()=> el.textContent = '', 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crew Dashboard | Capture Crew</title>
+  <link rel="stylesheet" href="crew.css">
+</head>
+<body>
+  <div class="bg-overlay"></div>
+
+  <header>
+    <h2>🎥 Capture Crew Dashboard</h2>
+    <div class="profile-menu">
+      <a href="crewprofile.html">Profile</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <center>
+    <section class="welcome">
+      <h3>Welcome, <span id="crewName"></span>!</h3>
+      <p>Manage your projects and explore new opportunities with Capture Crew.</p>
+    </section>
+  </center>
+
+  <section class="actions">
+    <div class="card" onclick="openPage('crewservices.html')">
+      <h4>View Services</h4>
+      <p>Check all current service requests from clients.</p>
+    </div>
+
+    <div class="card" onclick="openPage('crewbook.html')">
+      <h4>Create Booking</h4>
+      <p>Start a new booking or schedule upcoming events.</p>
+    </div>
+
+    <div class="card" onclick="openPage('crewprojects.html')">
+      <h4>View Projects</h4>
+      <p>Track your assigned or completed photo/video projects.</p>
+    </div>
+
+    <div class="card" onclick="openPage('crewmessages.html')">
+      <h4>Client Messages</h4>
+      <p>See client inquiries, feedback, and communication details.</p>
+    </div>
+  </section>
+
+  <script>
+    const loggedIn = localStorage.getItem('loggedIn');
+    if(!loggedIn){ window.location.href='join.html'; }
+
+    const user = JSON.parse(localStorage.getItem('crewUser'));
+    document.getElementById('crewName').textContent = user?.name || 'Crew Member';
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      localStorage.removeItem('loggedIn');
+      window.location.href='join.html';
+    });
+
+    function openPage(page){
+      window.location.href = page;
+    }
+
+    // ✅ Added: Sync live updates from edited profile
+    window.addEventListener('storage', () => {
+      const updatedUser = JSON.parse(localStorage.getItem('crewUser'));
+      if (updatedUser && updatedUser.name) {
+        document.getElementById('crewName').textContent = updatedUser.name;
+      }
+    });
+
+    // ✅ Added: Also check every time page loads
+    window.addEventListener('focus', () => {
+      const refreshedUser = JSON.parse(localStorage.getItem('crewUser'));
+      if (refreshedUser && refreshedUser.name) {
+        document.getElementById('crewName').textContent = refreshedUser.name;
+      }
+    });
+  </script>
+</body>
+</html>
